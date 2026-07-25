@@ -14,19 +14,21 @@ GOOGLE_SHEET_NAME = "pedidos_confeccao"
 
 # Função para conectar ao Google Sheets
 @st.cache_resource
+@st.cache_resource
 def conectar_google_sheets():
     SCOPES = [
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    # Se estiver rodando localmente no PC, usa o arquivo credentials.json
     if os.path.exists("credentials.json"):
         creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
     else:
-        # Se estiver no Streamlit Cloud, puxa diretamente dos secrets configurados no painel
-        creds = Credentials.from_service_account_info(
-            st.secrets["gcp_service_account"], scopes=SCOPES
-        )
+        # Puxa os dados dos secrets e corrige o formato da chave privada para aceitar as quebras de linha
+        gcp_secrets = dict(st.secrets["gcp_service_account"])
+        if "private_key" in gcp_secrets:
+            gcp_secrets["private_key"] = gcp_secrets["private_key"].replace("\\n", "\n")
+            
+        creds = Credentials.from_service_account_info(gcp_secrets, scopes=SCOPES)
     
     client = gspread.authorize(creds)
     sheet = client.open(GOOGLE_SHEET_NAME).sheet1 
