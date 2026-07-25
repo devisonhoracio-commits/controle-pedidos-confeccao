@@ -12,8 +12,7 @@ st.set_page_config(page_title="Sistema de Confecção Pro", layout="wide", page_
 # Nome da Planilha no Google Sheets
 GOOGLE_SHEET_NAME = "pedidos_confeccao"
 
-# Função para conectar ao Google Sheets
-@st.cache_resource
+# Função para conectar ao Google Sheets (corrigida sem duplicação de cache)
 @st.cache_resource
 def conectar_google_sheets():
     SCOPES = [
